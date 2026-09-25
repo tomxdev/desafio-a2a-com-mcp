@@ -166,7 +166,7 @@ Dependências principais:
 | R5 | `python3` não existe no Windows; o validador do enunciado usa `python3` | Aberto — Fase 13: README documenta `python` e `python3` |
 | R6 | Caminhos longos no Windows (limite de 260 chars) quebram `venv`/`ensurepip` | ⚠️ **Confirmado na Fase 1** (`WinError 206` no scratchpad, 241 chars). O projeto está em caminho longo — Fase 2 valida o venv **no próprio diretório do projeto** antes de qualquer outra coisa |
 | R7 | Header `Mcp-Name`/`Mcp-Method` que não bate com o corpo é recusado com `-32020` | ✅ **Resolvido na Fase 9:** o cliente do SDK monta os headers corretamente; o servidor recusa divergência nos dois campos, confirmado com teste negativo |
-| R8 | A verificação 34 varre **todas** as respostas A2A procurando os 40 primeiros caracteres do `requestState` | Aberto — Fase 11 |
+| R8 | A verificação 34 varre **todas** as respostas A2A procurando os 40 primeiros caracteres do `requestState` | ✅ **Resolvido na Fase 11:** o estado pausado fica fora de `Task.como_json()`, com teste travando |
 | R9 | O validador exige os dois processos **recém-iniciados**; rodar duas vezes seguidas produz falsos negativos | Aberto — Fase 2 (script de subida) e todas as fases de validação |
 | R11 | O Git Bash converte um valor de env como `/mcp` em caminho do Windows | ⚠️ **Descoberto na Fase 8.** Os caminhos saíram do `.env.example`; o servidor recusa caminho sem `/` inicial e aponta `MSYS_NO_PATHCONV=1` |
 | R10 | Um `GET` em `/mcp` abre um stream SSE e **trava** o cliente | ⚠️ **Descoberto na Fase 1.** Em teste manual usar sempre `POST`; nunca `curl` sem `-X POST` |
@@ -750,17 +750,17 @@ Fases 9 e 10.
 
 ## Tarefas
 
-- [ ] ao receber `input_required` do servidor MCP, colocar a Task em `TASK_STATE_INPUT_REQUIRED`
-- [ ] devolver como mensagem de texto da Task exatamente `alternativas: <ids separados por virgula e espaco>`, na ordem do enum, sem prefixo nem saudação
-- [ ] guardar, associado à Task: o `requestState` (opaco), a chave de `inputRequests`, o enum de alternativas e os argumentos do `tools/call` original
-- [ ] garantir que o `requestState` **não** aparece no card, no artifact, no histórico nem em nenhuma resposta A2A
-- [ ] implementar a continuação `escolha=<id>`: montar `inputResponses` com a mesma chave e `action: "accept"`, ecoar o `requestState` sem modificação e emitir o `tools/call` com **id de JSON-RPC novo**
-- [ ] implementar `escolha=recusar`: `action: "decline"`, concluindo a Task em `TASK_STATE_CANCELED`
-- [ ] implementar escolha fora do enum: a Task **permanece** em `TASK_STATE_INPUT_REQUIRED` e a linha de alternativas é repetida igual
-- [ ] garantir isolamento por Task: duas Tasks pausadas ao mesmo tempo concluem cada uma com a sua reserva, sem trocar `requestState`
-- [ ] garantir determinismo: o mesmo pedido enviado duas vezes produz a mesma mensagem de pausa, sem criar reserva
-- [ ] concluir a Task retomada em `TASK_STATE_COMPLETED` com o artifact da reserva na sala escolhida
-- [ ] commit por contexto, PR `feature/a-ponte` → `develop`, merge
+- [x] ao receber `input_required` do servidor MCP, colocar a Task em `TASK_STATE_INPUT_REQUIRED`
+- [x] devolver como mensagem de texto da Task exatamente `alternativas: <ids separados por virgula e espaco>`, na ordem do enum, sem prefixo nem saudação
+- [x] guardar, associado à Task: o `requestState` (opaco), a chave de `inputRequests`, o enum de alternativas e os argumentos do `tools/call` original
+- [x] garantir que o `requestState` **não** aparece no card, no artifact, no histórico nem em nenhuma resposta A2A
+- [x] implementar a continuação `escolha=<id>`: montar `inputResponses` com a mesma chave e `action: "accept"`, ecoar o `requestState` sem modificação e emitir o `tools/call` com **id de JSON-RPC novo**
+- [x] implementar `escolha=recusar`: `action: "decline"`, concluindo a Task em `TASK_STATE_CANCELED`
+- [x] implementar escolha fora do enum: a Task **permanece** em `TASK_STATE_INPUT_REQUIRED` e a linha de alternativas é repetida igual
+- [x] garantir isolamento por Task: duas Tasks pausadas ao mesmo tempo concluem cada uma com a sua reserva, sem trocar `requestState`
+- [x] garantir determinismo: o mesmo pedido enviado duas vezes produz a mesma mensagem de pausa, sem criar reserva
+- [x] concluir a Task retomada em `TASK_STATE_COMPLETED` com o artifact da reserva na sala escolhida
+- [x] commit por contexto, PR `feature/a-ponte` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -934,7 +934,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 8 — `requestState` protegido | Concluída | Fases 1 (R2/R3/R4/D2), 7 | **Servidor MCP completo**: 20/20 e retry sobrevivendo ao restart |
 | Fase 9 — Agente host MCP | Concluída | Fase 8 | Ciclo de MRTR completo sem A2A; `tools/list` antes do 1º `tools/call`, traceparent propagado, retry com id novo |
 | Fase 10 — Agente servidor A2A | Concluída | Fase 9 | 29 das 36 verificações; card idêntico à fixture 07 |
-| Fase 11 — A ponte | Pendente | Fases 9, 10 | |
+| Fase 11 — A ponte | Concluída | Fases 9, 10 | **36/36 no validador, exit 0**; retry com id novo confirmado no stderr |
 | Fase 12 — Validação e fluxo do avaliador | Pendente | Fase 11 | |
 | Fase 13 — README | Pendente | Fase 12 | |
 | Fase 14 — Entrega e clone limpo | Pendente | Fase 13 | |

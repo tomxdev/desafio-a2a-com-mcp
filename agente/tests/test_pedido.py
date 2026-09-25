@@ -61,3 +61,28 @@ def test_recusa_pedido_incompleto():
     with pytest.raises(PedidoInvalido) as capturado:
         interpretar_reserva("reservar sala=sala-garagem inicio=2026-11-03T14:00:00-03:00")
     assert "fim" in str(capturado.value) and "responsavel" in str(capturado.value)
+
+
+# --- continuacao ----------------------------------------------------------
+
+
+def test_le_a_escolha():
+    from pedido import e_recusa, interpretar_escolha
+
+    assert interpretar_escolha("escolha=sala-fusca") == "sala-fusca"
+    assert not e_recusa("sala-fusca")
+
+
+def test_le_a_recusa():
+    from pedido import e_recusa, interpretar_escolha
+
+    assert e_recusa(interpretar_escolha("escolha=recusar"))
+    assert e_recusa(interpretar_escolha("escolha=RECUSAR"))
+
+
+@pytest.mark.parametrize("texto", ["", "sala-fusca", "escolha=", "quero a fusca"])
+def test_recusa_continuacao_malformada(texto):
+    from pedido import interpretar_escolha
+
+    with pytest.raises(PedidoInvalido):
+        interpretar_escolha(texto)

@@ -699,19 +699,19 @@ Fase 9.
 
 ## Tarefas
 
-- [ ] implementar `GET /.well-known/agent-card.json` devolvendo o card na forma v1.0
-- [ ] declarar no card: identidade, `supportedInterfaces` com `url`, `protocolBinding: "JSONRPC"` e `protocolVersion: "1.0"`, `capabilities` e a skill de id `reservar-sala`
-- [ ] conferir a grafia do card contra `exemplos/wire/07-a2a-agent-card.json` (é `supportedInterfaces`, não `interfaces`; é `protocolBinding`, não `preferredTransport`)
-- [ ] implementar o endpoint JSON-RPC `/a2a` roteando `SendMessage` e `GetTask`
-- [ ] implementar o parser de `reservar sala=<id> inicio=<iso> fim=<iso> responsavel=<nome>`
-- [ ] implementar a Task com `id`, `contextId`, `status`, `history` e `artifacts`, transitando por `TASK_STATE_SUBMITTED` e `TASK_STATE_WORKING`
-- [ ] implementar o caminho feliz: chamar `reservar_sala` no servidor MCP e concluir em `TASK_STATE_COMPLETED`
-- [ ] montar o artifact de `name: "reserva"` cujo conteúdo é o JSON da reserva, com o campo `politica` preenchido com a versão **lida do resource**
-- [ ] implementar o caminho de falha: `isError: true` da tool termina a Task em `TASK_STATE_FAILED` com a **mensagem exata da tool** visível na mensagem de status e no histórico
-- [ ] implementar `GetTask` devolvendo o estado corrente e os artifacts quando existirem
-- [ ] recusar com erro JSON-RPC qualquer `SendMessage` que referencie Task em estado terminal
-- [ ] propagar o header `traceparent` do request A2A para o fluxo MCP daquela Task
-- [ ] commit por contexto, PR `feature/agente-a2a` → `develop`, merge
+- [x] implementar `GET /.well-known/agent-card.json` devolvendo o card na forma v1.0
+- [x] declarar no card: identidade, `supportedInterfaces` com `url`, `protocolBinding: "JSONRPC"` e `protocolVersion: "1.0"`, `capabilities` e a skill de id `reservar-sala`
+- [x] conferir a grafia do card contra `exemplos/wire/07-a2a-agent-card.json` (é `supportedInterfaces`, não `interfaces`; é `protocolBinding`, não `preferredTransport`)
+- [x] implementar o endpoint JSON-RPC `/a2a` roteando `SendMessage` e `GetTask`
+- [x] implementar o parser de `reservar sala=<id> inicio=<iso> fim=<iso> responsavel=<nome>`
+- [x] implementar a Task com `id`, `contextId`, `status`, `history` e `artifacts`, transitando por `TASK_STATE_SUBMITTED` e `TASK_STATE_WORKING`
+- [x] implementar o caminho feliz: chamar `reservar_sala` no servidor MCP e concluir em `TASK_STATE_COMPLETED`
+- [x] montar o artifact de `name: "reserva"` cujo conteúdo é o JSON da reserva, com o campo `politica` preenchido com a versão **lida do resource**
+- [x] implementar o caminho de falha: `isError: true` da tool termina a Task em `TASK_STATE_FAILED` com a **mensagem exata da tool** visível na mensagem de status e no histórico
+- [x] implementar `GetTask` devolvendo o estado corrente e os artifacts quando existirem
+- [x] recusar com erro JSON-RPC qualquer `SendMessage` que referencie Task em estado terminal
+- [x] propagar o header `traceparent` do request A2A para o fluxo MCP daquela Task
+- [x] commit por contexto, PR `feature/agente-a2a` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -933,7 +933,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 7 — MRTR `input_required` | Concluída | Fases 1 (D1), 6 | **As 20 verificações do lado MCP passam**; resposta idêntica à fixture 03 |
 | Fase 8 — `requestState` protegido | Concluída | Fases 1 (R2/R3/R4/D2), 7 | **Servidor MCP completo**: 20/20 e retry sobrevivendo ao restart |
 | Fase 9 — Agente host MCP | Concluída | Fase 8 | Ciclo de MRTR completo sem A2A; `tools/list` antes do 1º `tools/call`, traceparent propagado, retry com id novo |
-| Fase 10 — Agente servidor A2A | Pendente | Fase 9 | |
+| Fase 10 — Agente servidor A2A | Concluída | Fase 9 | 29 das 36 verificações; card idêntico à fixture 07 |
 | Fase 11 — A ponte | Pendente | Fases 9, 10 | |
 | Fase 12 — Validação e fluxo do avaliador | Pendente | Fase 11 | |
 | Fase 13 — README | Pendente | Fase 12 | |

@@ -165,7 +165,7 @@ Dependências principais:
 | R4 | O `-32021` precisa sair com `data.requiredCapabilities` | ✅ **Resolvido na Fase 1:** o resolver produz `-32021` + `data.requiredCapabilities` + HTTP 400, nativamente |
 | R5 | `python3` não existe no Windows; o validador do enunciado usa `python3` | Aberto — Fase 13: README documenta `python` e `python3` |
 | R6 | Caminhos longos no Windows (limite de 260 chars) quebram `venv`/`ensurepip` | ⚠️ **Confirmado na Fase 1** (`WinError 206` no scratchpad, 241 chars). O projeto está em caminho longo — Fase 2 valida o venv **no próprio diretório do projeto** antes de qualquer outra coisa |
-| R7 | Header `Mcp-Name`/`Mcp-Method` que não bate com o corpo é recusado com `-32020` | Aberto — Fase 9 (o cliente do SDK monta os headers sozinho) |
+| R7 | Header `Mcp-Name`/`Mcp-Method` que não bate com o corpo é recusado com `-32020` | ✅ **Resolvido na Fase 9:** o cliente do SDK monta os headers corretamente; o servidor recusa divergência nos dois campos, confirmado com teste negativo |
 | R8 | A verificação 34 varre **todas** as respostas A2A procurando os 40 primeiros caracteres do `requestState` | Aberto — Fase 11 |
 | R9 | O validador exige os dois processos **recém-iniciados**; rodar duas vezes seguidas produz falsos negativos | Aberto — Fase 2 (script de subida) e todas as fases de validação |
 | R11 | O Git Bash converte um valor de env como `/mcp` em caminho do Windows | ⚠️ **Descoberto na Fase 8.** Os caminhos saíram do `.env.example`; o servidor recusa caminho sem `/` inicial e aponta `MSYS_NO_PATHCONV=1` |
@@ -646,18 +646,18 @@ Fase 8.
 
 ## Tarefas
 
-- [ ] criar o cliente MCP apontando para `MCP_URL` (padrão `http://127.0.0.1:7301/mcp`), mantendo o objeto cliente vivo entre chamadas
-- [ ] emitir `tools/list` **antes** da primeira chamada de tool, e usar a lista descoberta em vez de uma lista fixa no código
-- [ ] ler o resource `politica://uso` e extrair a versão da primeira linha
-- [ ] montar o `_meta` de todo request com `io.modelcontextprotocol/protocolVersion` e `io.modelcontextprotocol/clientCapabilities` no formato `{"elicitation": {"form": {}}}`
-- [ ] garantir que os headers `MCP-Protocol-Version`, `Mcp-Method` e, em `tools/call`/`resources/read`, `Mcp-Name` batem com o corpo (R7)
-- [ ] aceitar um `traceparent` externo e propagá-lo via `meta={"traceparent": ...}`, mantendo o **mesmo trace-id** e gerando span-id novo
-- [ ] registrar um `elicitation_callback` **apenas para declarar a capability** (sem ele o servidor responde `-32021`) e dirigir o ciclo por `client.session.call_tool(..., allow_input_required=True)`, que devolve o `InputRequiredResult` cru sem nunca invocar o callback
-- [ ] manter o `Client` vivo no lifespan da aplicação, já que ele é um `async with`
-- [ ] registrar no README (Fase 13) que o SDK declara `{"form": {}, "url": {}}` e sobrescreve qualquer `clientCapabilities` passado em `meta=` (D4)
-- [ ] implementar o retry com id de JSON-RPC novo, levando `inputResponses` com a mesma chave recebida e o `requestState` ecoado sem modificação
-- [ ] escrever `agente/ciclo_manual.py`, que percorre: descoberta → leitura do resource → reserva livre → conflito → pausa → retomada, imprimindo cada passo
-- [ ] commit por contexto, PR `feature/agente-host-mcp` → `develop`, merge
+- [x] criar o cliente MCP apontando para `MCP_URL` (padrão `http://127.0.0.1:7301/mcp`), mantendo o objeto cliente vivo entre chamadas
+- [x] emitir `tools/list` **antes** da primeira chamada de tool, e usar a lista descoberta em vez de uma lista fixa no código
+- [x] ler o resource `politica://uso` e extrair a versão da primeira linha
+- [x] montar o `_meta` de todo request com `io.modelcontextprotocol/protocolVersion` e `io.modelcontextprotocol/clientCapabilities` no formato `{"elicitation": {"form": {}}}`
+- [x] garantir que os headers `MCP-Protocol-Version`, `Mcp-Method` e, em `tools/call`/`resources/read`, `Mcp-Name` batem com o corpo (R7)
+- [x] aceitar um `traceparent` externo e propagá-lo via `meta={"traceparent": ...}`, mantendo o **mesmo trace-id** e gerando span-id novo
+- [x] registrar um `elicitation_callback` **apenas para declarar a capability** (sem ele o servidor responde `-32021`) e dirigir o ciclo por `client.session.call_tool(..., allow_input_required=True)`, que devolve o `InputRequiredResult` cru sem nunca invocar o callback
+- [x] manter o `Client` vivo no lifespan da aplicação, já que ele é um `async with`
+- [x] registrar no README (Fase 13) que o SDK declara `{"form": {}, "url": {}}` e sobrescreve qualquer `clientCapabilities` passado em `meta=` (D4)
+- [x] implementar o retry com id de JSON-RPC novo, levando `inputResponses` com a mesma chave recebida e o `requestState` ecoado sem modificação
+- [x] escrever `agente/ciclo_manual.py`, que percorre: descoberta → leitura do resource → reserva livre → conflito → pausa → retomada, imprimindo cada passo
+- [x] commit por contexto, PR `feature/agente-host-mcp` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -932,7 +932,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 6 — `reservar_sala` caminho feliz | Concluída | Fases 4, 5 | Verificações 1 a 12 e 20 passando; 39 testes verdes |
 | Fase 7 — MRTR `input_required` | Concluída | Fases 1 (D1), 6 | **As 20 verificações do lado MCP passam**; resposta idêntica à fixture 03 |
 | Fase 8 — `requestState` protegido | Concluída | Fases 1 (R2/R3/R4/D2), 7 | **Servidor MCP completo**: 20/20 e retry sobrevivendo ao restart |
-| Fase 9 — Agente host MCP | Pendente | Fase 8 | |
+| Fase 9 — Agente host MCP | Concluída | Fase 8 | Ciclo de MRTR completo sem A2A; `tools/list` antes do 1º `tools/call`, traceparent propagado, retry com id novo |
 | Fase 10 — Agente servidor A2A | Pendente | Fase 9 | |
 | Fase 11 — A ponte | Pendente | Fases 9, 10 | |
 | Fase 12 — Validação e fluxo do avaliador | Pendente | Fase 11 | |

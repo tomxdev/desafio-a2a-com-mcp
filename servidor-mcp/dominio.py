@@ -62,15 +62,19 @@ def _ler_json(nome: str) -> list[dict]:
     return json.loads((DADOS / nome).read_text(encoding="utf-8"))
 
 
-def _ler_versao_da_politica() -> str:
-    """A versao declarada na primeira linha de `dados/politica-de-uso.md`."""
-    primeira = (DADOS / "politica-de-uso.md").read_text(encoding="utf-8").splitlines()[0]
-    return primeira.split(":", 1)[1].strip()
+def _versao_declarada(politica: str) -> str:
+    """A versao declarada na primeira linha da politica de uso."""
+    return politica.splitlines()[0].split(":", 1)[1].strip()
 
 
 SALAS: list[SalaOut] = [SalaOut(**s) for s in _ler_json("salas.json")]
 RESERVAS: list[Reserva] = [Reserva(**r) for r in _ler_json("reservas.json")]
-VERSAO_DA_POLITICA: str = _ler_versao_da_politica()
+
+# `read_text` normaliza CRLF para LF, entao o resource sai com as quebras de
+# linha que exemplos/wire/05-resources-read-politica.json mostra, mesmo com o
+# arquivo em CRLF no disco de um checkout Windows.
+POLITICA: str = (DADOS / "politica-de-uso.md").read_text(encoding="utf-8")
+VERSAO_DA_POLITICA: str = _versao_declarada(POLITICA)
 
 
 def sala_por_id(identificador: str) -> SalaOut | None:

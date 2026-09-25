@@ -17,7 +17,7 @@ import sys
 from mcp.server import MCPServer
 
 import regras
-from dominio import SALAS, ConflitoOut, Disponibilidade, ListaDeSalas
+from dominio import POLITICA, SALAS, ConflitoOut, Disponibilidade, ListaDeSalas
 from log import log_middleware
 
 HOST = os.environ.get("MCP_HOST", "127.0.0.1")
@@ -49,6 +49,21 @@ def consultar_disponibilidade(sala: str, inicio: str, fim: str) -> Disponibilida
             for r in colisoes
         ],
     )
+
+
+@mcp.resource(
+    "politica://uso",
+    name="politica-de-uso",
+    description="A politica de uso das salas, com a versao declarada na primeira linha.",
+    mime_type="text/markdown",
+)
+def politica_de_uso() -> str:
+    """O conteudo de dados/politica-de-uso.md.
+
+    Resource, e nao tool, porque quem controla a leitura e a aplicacao: o
+    agente decide ler a politica para extrair a versao que vai no artifact.
+    """
+    return POLITICA
 
 
 def criar_app():

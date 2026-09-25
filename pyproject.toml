@@ -1,0 +1,28 @@
+[project]
+name = "desafio-a2a-com-mcp"
+version = "1.0.0"
+description = "A Ponte: servidor MCP e agente A2A para as salas da Hill Valley Tech"
+requires-python = ">=3.10"
+
+# Versoes travadas. Nenhuma dependencia de provedor de LLM: o agente decide por regra.
+# O SDK do MCP ja arrasta mcp-types, pydantic, cryptography, jsonschema, anyio e httpx2.
+dependencies = [
+    "mcp==2.2.0",
+    "starlette==1.7.0",
+    "uvicorn==0.54.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest==9.1.1"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+# servidor-mcp/ e agente/ tem hifen no nome e nao sao pacotes importaveis: os dois
+# processos sobem por caminho de arquivo. O projeto existe aqui so para travar as versoes.
+[tool.setuptools]
+py-modules = []
+
+[tool.pytest.ini_options]
+testpaths = ["servidor-mcp/tests", "agente/tests"]

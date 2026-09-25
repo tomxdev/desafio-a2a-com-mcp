@@ -1,11 +1,11 @@
 """O agente por fora: servidor A2A no binding JSON-RPC.
 
 Atende `SendMessage` e `GetTask` em /a2a e publica o Agent Card no
-well-known. Por dentro, cada pedido vira uma chamada ao servidor MCP pelo
-`HostMCP` — por HTTP, como um cliente MCP de verdade.
+well-known. Este modulo so roteia: quem traduz entre o servidor MCP e a Task
+e `ponte.py`.
 
-O agente nao decide nada de dominio: conflito, politica e alternativas sao
-resposta do servidor MCP. O que ele faz aqui e mover a Task.
+O agente nao decide nada de dominio. Conflito, politica e alternativas sao
+resposta do servidor MCP; aqui a Task so se move.
 """
 
 from __future__ import annotations
@@ -17,10 +17,10 @@ from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.routing import Route
 
+import ponte
 import tarefas as t
 from card import agent_card
-from cliente_mcp import Conclusao, HostMCP
-from pedido import PedidoInvalido, interpretar_reserva
+from cliente_mcp import HostMCP
 
 PEDIDO_INVALIDO = -32602
 TASK_NAO_ENCONTRADA = -32001
@@ -38,72 +38,8 @@ def _ok(id_rpc: Any, resultado: dict[str, Any]) -> JSONResponse:
     return JSONResponse({"jsonrpc": "2.0", "id": id_rpc, "result": resultado})
 
 
-def _texto_de(mensagem: dict[str, Any]) -> str:
-    return " ".join(p.get("text", "") for p in mensagem.get("parts") or [])
-
-
 async def _card(request: Request) -> JSONResponse:
     return JSONResponse(agent_card())
-
-
-async def _concluir(tarefa: t.Task, conclusao: Conclusao, host: HostMCP) -> None:
-    """Traduz a resposta do servidor MCP no desfecho da Task."""
-    if conclusao.erro:
-        # A mensagem exata da tool precisa chegar ao cliente A2A.
-        tarefa.mover_para(t.FAILED, conclusao.texto)
-        return
-
-    dados = conclusao.dados
-    if not dados.get("reservado"):
-        tarefa.mover_para(t.CANCELED, dados.get("motivo") or "recusado")
-        return
-
-    tarefa.anexar(
-        "reserva",
-        {
-            "reserva": dados.get("reserva"),
-            "sala": dados.get("sala"),
-            "inicio": dados.get("inicio"),
-            "fim": dados.get("fim"),
-            "responsavel": dados.get("responsavel"),
-            # A versao vem do resource lido pelo agente, nao do que a tool
-            # devolveu: e a aplicacao que escolhe ler a politica.
-            "politica": await host.versao_da_politica(),
-        },
-    )
-    tarefa.mover_para(
-        t.COMPLETED, f"Reserva {dados.get('reserva')} confirmada na {dados.get('sala')}."
-    )
-
-
-async def _abrir_tarefa(
-    host: HostMCP, tarefas: t.Tarefas, mensagem: dict[str, Any], traceparent: str | None
-) -> t.Task:
-    tarefa = tarefas.abrir()
-    tarefa.registrar(mensagem)
-
-    try:
-        pedido = interpretar_reserva(_texto_de(mensagem))
-    except PedidoInvalido as erro:
-        tarefa.mover_para(t.FAILED, str(erro))
-        return tarefa
-
-    tarefa.argumentos = pedido.como_argumentos()
-    tarefa.mover_para(t.WORKING)
-
-    resultado = await host.reservar(tarefa.argumentos, traceparent)
-    if isinstance(resultado, Conclusao):
-        await _concluir(tarefa, resultado, host)
-    else:
-        # Ponto de costura: e aqui que a Fase 11 poe a Task em
-        # TASK_STATE_INPUT_REQUIRED e guarda o requestState.
-        tarefa.mover_para(t.FAILED, "pausa ainda nao implementada")
-    return tarefa
-
-
-async def _continuar_tarefa(tarefa: t.Task, mensagem: dict[str, Any]) -> None:
-    # A continuacao chega na Fase 11. Aqui so o registro da mensagem.
-    tarefa.registrar(mensagem)
 
 
 async def _send_message(
@@ -118,7 +54,7 @@ async def _send_message(
 
     identificador = mensagem.get("taskId")
     if not identificador:
-        tarefa = await _abrir_tarefa(host, tarefas, mensagem, traceparent)
+        tarefa = await ponte.abrir(host, tarefas, mensagem, traceparent)
         return _ok(id_rpc, {"task": tarefa.como_json()})
 
     tarefa = tarefas.buscar(identificador)
@@ -132,7 +68,7 @@ async def _send_message(
             f"Task {identificador} ja terminou em {tarefa.estado} e nao aceita continuacao",
         )
 
-    await _continuar_tarefa(tarefa, mensagem)
+    await ponte.continuar(host, tarefa, mensagem, traceparent)
     return _ok(id_rpc, {"task": tarefa.como_json()})
 
 

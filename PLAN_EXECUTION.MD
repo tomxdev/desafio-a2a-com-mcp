@@ -467,10 +467,10 @@ Fase 3. Independente da Fase 4.
 
 ## Tarefas
 
-- [ ] registrar o resource na URI `politica://uso` devolvendo o conteúdo de `dados/politica-de-uso.md` com `mimeType: text/markdown`
-- [ ] garantir que o conteúdo devolvido preserva a primeira linha `versao: 2026-11-01`
-- [ ] fazer `resources/read` de URI desconhecida devolver `-32602` (nunca `contents` vazio)
-- [ ] confirmar que o request de `resources/read` também é registrado no stderr
+- [x] registrar o resource na URI `politica://uso` devolvendo o conteúdo de `dados/politica-de-uso.md` com `mimeType: text/markdown`
+- [x] garantir que o conteúdo devolvido preserva a primeira linha `versao: 2026-11-01`
+- [x] fazer `resources/read` de URI desconhecida devolver `-32602` (nunca `contents` vazio)
+- [x] confirmar que o request de `resources/read` também é registrado no stderr
 
 ## Critérios de aceite
 
@@ -927,7 +927,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 2 — Scaffolding e gitflow | Concluída | Fase 1 | Deps travadas, .env.example, scripts e .gitattributes; publicado em origin/develop; sem PR (ver nota) |
 | Fase 3 — Servidor MCP base | Concluída | Fases 1, 2 | Verificações 2, 3, 4, 5, 6 e 8 passando; log com método, id e traceparent |
 | Fase 4 — Regras e `consultar_disponibilidade` | Concluída | Fase 3 | Verificações 10, 11 e 12 passando; 29 testes unitários verdes |
-| Fase 5 — Resource `politica://uso` | Pendente | Fase 3 | |
+| Fase 5 — Resource `politica://uso` | Concluída | Fase 3 | Verificações 7 e 8 passando; resposta idêntica à fixture 05 |
 | Fase 6 — `reservar_sala` caminho feliz | Pendente | Fases 4, 5 | |
 | Fase 7 — MRTR `input_required` | Pendente | Fases 1 (D1), 6 | |
 | Fase 8 — `requestState` protegido | Pendente | Fases 1 (R2/R3/R4/D2), 7 | |

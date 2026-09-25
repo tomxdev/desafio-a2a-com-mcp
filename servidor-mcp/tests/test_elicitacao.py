@@ -9,8 +9,8 @@ from mcp.server.mcpserver import Elicit
 from mcp.server.mcpserver.exceptions import ToolError
 
 import dominio
+import elicitacao
 import regras
-import servidor
 
 DIA = "2026-11-03"
 
@@ -20,7 +20,7 @@ def h(hora: str) -> str:
 
 
 def resolver(sala: str, inicio: str, fim: str):
-    return asyncio.run(servidor.escolha_de_sala(sala, inicio, fim))
+    return asyncio.run(elicitacao.escolha_de_sala(sala, inicio, fim))
 
 
 def enum_de(elicit: Elicit) -> list[str]:

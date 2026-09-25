@@ -98,6 +98,9 @@ class HostMCP:
         self._cliente = Client(self._url, elicitation_callback=_nunca_responder)
         await self._cliente.__aenter__()
         await self._descobrir()
+        # A politica e estavel: ler uma vez na subida, junto da descoberta,
+        # deixa o log em ordem e evita um round-trip por Task.
+        await self.versao_da_politica()
         return self
 
     async def __aexit__(self, *excecao: Any) -> None:

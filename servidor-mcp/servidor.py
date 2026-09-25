@@ -14,23 +14,22 @@ from __future__ import annotations
 import os
 import sys
 
-from typing import Annotated, Literal
+from typing import Annotated
 
 from mcp.server import MCPServer
 from mcp.server.mcpserver import (
     AcceptedElicitation,
     CancelledElicitation,
     DeclinedElicitation,
-    Elicit,
     ElicitationResult,
     Resolve,
 )
 from mcp.server.mcpserver.exceptions import ToolError
 from mcp.server.request_state import RequestStateSecurity
-from pydantic import BaseModel, Field, create_model
 
 import dominio
 import regras
+from elicitacao import Escolha, escolha_de_sala
 from dominio import (
     POLITICA,
     SALAS,
@@ -100,50 +99,6 @@ def consultar_disponibilidade(sala: str, inicio: str, fim: str) -> Disponibilida
             for r in colisoes
         ],
     )
-
-
-PERGUNTA = "A sala pedida esta ocupada nesse intervalo. Escolha uma alternativa."
-
-
-class Escolha(BaseModel):
-    """A sala que vai ser reservada de fato."""
-
-    sala: str = Field(description="Sala alternativa escolhida")
-
-
-def _escolha_entre(opcoes: list[str]) -> type[BaseModel]:
-    """Um modelo cujo campo `sala` so aceita as alternativas calculadas.
-
-    O enum e por pedido, entao o tipo precisa ser montado na hora: `Elicit`
-    recebe um tipo, nao um schema solto.
-    """
-    return create_model(
-        "Escolha",
-        sala=(Literal[tuple(opcoes)], Field(description="Sala alternativa escolhida")),  # type: ignore[valid-type]
-    )
-
-
-async def escolha_de_sala(sala: str, inicio: str, fim: str) -> Escolha | Elicit[Escolha]:
-    """Resolve qual sala reservar, perguntando ao cliente so quando precisa.
-
-    Este e o lado servidor do MRTR. Nao existe canal de volta: quando falta
-    informacao, o resolver nao pergunta e espera, ele faz a resposta terminar
-    em `input_required` com a elicitation e um `requestState` opaco. O cliente
-    volta com um `tools/call` novo levando a resposta e o estado ecoado.
-
-    O resolver roda em todas as rodadas, inclusive no retry, entao ele repete
-    as validacoes e o calculo de alternativas.
-    """
-    pedida, comeco, termino = regras.validar_pedido(sala, inicio, fim)
-
-    if regras.esta_livre(sala, comeco, termino):
-        return Escolha(sala=sala)
-
-    opcoes = regras.alternativas(pedida, comeco, termino)
-    if not opcoes:
-        raise ToolError(regras.ERRO_SEM_ALTERNATIVAS)
-
-    return Elicit(PERGUNTA, _escolha_entre(opcoes))
 
 
 @mcp.tool()

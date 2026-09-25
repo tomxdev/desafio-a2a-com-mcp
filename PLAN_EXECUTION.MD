@@ -798,21 +798,21 @@ Fase 11.
 
 ## Tarefas
 
-- [ ] matar os dois processos e subir tudo do zero
-- [ ] rodar `python validador/validar.py --agente http://localhost:7300 --mcp http://localhost:7301` e conferir 36 PASS e código de saída 0
-- [ ] localizar no stderr do servidor MCP o `tools/list` anterior ao primeiro `tools/call`
-- [ ] localizar no stderr o `traceparent` com o trace-id impresso pelo validador na primeira linha
-- [ ] localizar no stderr o par de `tools/call` de uma reserva que passou pela pausa e conferir os ids diferentes
-- [ ] `curl` do agent card e conferência contra `exemplos/wire/07-a2a-agent-card.json`
-- [ ] enviar manualmente o `SendMessage` de `exemplos/wire/08-...json` e conferir a pausa com a ordem de alternativas
-- [ ] continuar com `escolha=sala-mirante` e conferir por `GetTask` a Task COMPLETED com o artifact e o campo `politica`
-- [ ] repetir o pedido e responder `escolha=recusar`, conferindo `TASK_STATE_CANCELED`
-- [ ] enviar `sala=sala-inexistente` e conferir `TASK_STATE_FAILED` com a mensagem exata no histórico
-- [ ] pegar um `requestState` direto do servidor MCP, trocar um caractere, reenviar e conferir `-32602`
-- [ ] repetir sem alterar o `requestState`, **reiniciando o servidor MCP** antes do retry, e conferir a reserva concluída
-- [ ] repetir o conflito sem declarar elicitation nas capabilities e conferir `-32021` com HTTP 400
-- [ ] confirmar `git status` de `dados/`, `validador/` e `exemplos/` sem alterações
-- [ ] guardar a saída completa do validador para o README
+- [x] matar os dois processos e subir tudo do zero
+- [x] rodar `python validador/validar.py --agente http://localhost:7300 --mcp http://localhost:7301` e conferir 36 PASS e código de saída 0
+- [x] localizar no stderr do servidor MCP o `tools/list` anterior ao primeiro `tools/call`
+- [x] localizar no stderr o `traceparent` com o trace-id impresso pelo validador na primeira linha
+- [x] localizar no stderr o par de `tools/call` de uma reserva que passou pela pausa e conferir os ids diferentes
+- [x] `curl` do agent card e conferência contra `exemplos/wire/07-a2a-agent-card.json`
+- [x] enviar manualmente o `SendMessage` de `exemplos/wire/08-...json` e conferir a pausa com a ordem de alternativas
+- [x] continuar com `escolha=sala-mirante` e conferir por `GetTask` a Task COMPLETED com o artifact e o campo `politica`
+- [x] repetir o pedido e responder `escolha=recusar`, conferindo `TASK_STATE_CANCELED`
+- [x] enviar `sala=sala-inexistente` e conferir `TASK_STATE_FAILED` com a mensagem exata no histórico
+- [x] pegar um `requestState` direto do servidor MCP, trocar um caractere, reenviar e conferir `-32602`
+- [x] repetir sem alterar o `requestState`, **reiniciando o servidor MCP** antes do retry, e conferir a reserva concluída
+- [x] repetir o conflito sem declarar elicitation nas capabilities e conferir `-32021` com HTTP 400
+- [x] confirmar `git status` de `dados/`, `validador/` e `exemplos/` sem alterações
+- [x] guardar a saída completa do validador para o README
 
 ## Critérios de aceite
 
@@ -826,6 +826,14 @@ Fase 11.
 - Código de saída do validador: `0`
 - `git diff 263f17e -- dados validador exemplos` vazio
 - Evidências dos passos manuais registradas (saída de `curl` e trechos de stderr)
+
+### Observacao para o avaliador
+
+O passo 7 do fluxo (`alternativas: sala-fusca, sala-mirante`) so da essa ordem com os
+processos **recem-iniciados**. Rodando logo depois do validador, a `sala-fusca` das 14h
+ja foi reservada pela verificacao 30 e a lista sai como `alternativas: sala-mirante` —
+que e, alias, o que a propria fixture 08 mostra. Os dois resultados estao certos; o que
+muda e o estado em memoria.
 
 ## Resultado esperado
 
@@ -935,7 +943,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 9 — Agente host MCP | Concluída | Fase 8 | Ciclo de MRTR completo sem A2A; `tools/list` antes do 1º `tools/call`, traceparent propagado, retry com id novo |
 | Fase 10 — Agente servidor A2A | Concluída | Fase 9 | 29 das 36 verificações; card idêntico à fixture 07 |
 | Fase 11 — A ponte | Concluída | Fases 9, 10 | **36/36 no validador, exit 0**; retry com id novo confirmado no stderr |
-| Fase 12 — Validação e fluxo do avaliador | Pendente | Fase 11 | |
+| Fase 12 — Validação e fluxo do avaliador | Concluída | Fase 11 | 36/36 exit 0; os 13 passos do fluxo reproduzidos; pastas imutáveis intactas |
 | Fase 13 — README | Pendente | Fase 12 | |
 | Fase 14 — Entrega e clone limpo | Pendente | Fase 13 | |
 

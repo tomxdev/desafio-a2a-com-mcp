@@ -548,17 +548,17 @@ Fases 4 e 6, e a decisão **D1** da Fase 1.
 
 ## Tarefas
 
-- [ ] implementar o resolver `escolha_de_sala(sala, inicio, fim)`, injetado na tool como `Annotated[ElicitationResult[Escolha], Resolve(escolha_de_sala)]` (D1); o **union** é obrigatório, senão `decline` vira `isError` e reprova a verificação 19
-- [ ] tratar sala inexistente **dentro do resolver** também: ele roda antes do corpo da tool e em todas as rodadas
-- [ ] gerar o enum dinâmico com `pydantic.create_model("Escolha", sala=(Literal[tuple(alternativas)], Field(description="Sala alternativa escolhida")))`
-- [ ] confirmar que sai **exatamente uma** entrada em `inputRequests`
-- [ ] garantir que a entrada é um `elicitation/create` com `mode: "form"` e a mensagem `A sala pedida esta ocupada nesse intervalo. Escolha uma alternativa.`
-- [ ] garantir que o `requestedSchema` é **plano**: um objeto com a propriedade `sala` do tipo string, restrita às alternativas, e `required: ["sala"]`
-- [ ] garantir que, com duas ou mais alternativas, o schema traz `enum` na ordem definida pela regra (capacidade crescente, id em empate)
-- [ ] tratar o caso de alternativa única (`enum` de um item ou `const`, ambos aceitos)
-- [ ] fazer o conflito **sem nenhuma alternativa** levantar `ToolError("Sem alternativas disponiveis no intervalo")` dentro do resolver, sem elicitation
-- [ ] confirmar que o pedido em conflito **não cria reserva** e não muda o estado em memória
-- [ ] commit por contexto, PR `feature/mrtr-input-required` → `develop`, merge
+- [x] implementar o resolver `escolha_de_sala(sala, inicio, fim)`, injetado na tool como `Annotated[ElicitationResult[Escolha], Resolve(escolha_de_sala)]` (D1); o **union** é obrigatório, senão `decline` vira `isError` e reprova a verificação 19
+- [x] tratar sala inexistente **dentro do resolver** também: ele roda antes do corpo da tool e em todas as rodadas
+- [x] gerar o enum dinâmico com `pydantic.create_model("Escolha", sala=(Literal[tuple(alternativas)], Field(description="Sala alternativa escolhida")))`
+- [x] confirmar que sai **exatamente uma** entrada em `inputRequests`
+- [x] garantir que a entrada é um `elicitation/create` com `mode: "form"` e a mensagem `A sala pedida esta ocupada nesse intervalo. Escolha uma alternativa.`
+- [x] garantir que o `requestedSchema` é **plano**: um objeto com a propriedade `sala` do tipo string, restrita às alternativas, e `required: ["sala"]`
+- [x] garantir que, com duas ou mais alternativas, o schema traz `enum` na ordem definida pela regra (capacidade crescente, id em empate)
+- [x] tratar o caso de alternativa única (`enum` de um item ou `const`, ambos aceitos)
+- [x] fazer o conflito **sem nenhuma alternativa** levantar `ToolError("Sem alternativas disponiveis no intervalo")` dentro do resolver, sem elicitation
+- [x] confirmar que o pedido em conflito **não cria reserva** e não muda o estado em memória
+- [x] commit por contexto, PR `feature/mrtr-input-required` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -929,7 +929,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 4 — Regras e `consultar_disponibilidade` | Concluída | Fase 3 | Verificações 10, 11 e 12 passando; 29 testes unitários verdes |
 | Fase 5 — Resource `politica://uso` | Concluída | Fase 3 | Verificações 7 e 8 passando; resposta idêntica à fixture 05 |
 | Fase 6 — `reservar_sala` caminho feliz | Concluída | Fases 4, 5 | Verificações 1 a 12 e 20 passando; 39 testes verdes |
-| Fase 7 — MRTR `input_required` | Pendente | Fases 1 (D1), 6 | |
+| Fase 7 — MRTR `input_required` | Concluída | Fases 1 (D1), 6 | **As 20 verificações do lado MCP passam**; resposta idêntica à fixture 03 |
 | Fase 8 — `requestState` protegido | Pendente | Fases 1 (R2/R3/R4/D2), 7 | |
 | Fase 9 — Agente host MCP | Pendente | Fase 8 | |
 | Fase 10 — Agente servidor A2A | Pendente | Fase 9 | |

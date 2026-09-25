@@ -168,6 +168,7 @@ Dependências principais:
 | R7 | Header `Mcp-Name`/`Mcp-Method` que não bate com o corpo é recusado com `-32020` | Aberto — Fase 9 (o cliente do SDK monta os headers sozinho) |
 | R8 | A verificação 34 varre **todas** as respostas A2A procurando os 40 primeiros caracteres do `requestState` | Aberto — Fase 11 |
 | R9 | O validador exige os dois processos **recém-iniciados**; rodar duas vezes seguidas produz falsos negativos | Aberto — Fase 2 (script de subida) e todas as fases de validação |
+| R11 | O Git Bash converte um valor de env como `/mcp` em caminho do Windows | ⚠️ **Descoberto na Fase 8.** Os caminhos saíram do `.env.example`; o servidor recusa caminho sem `/` inicial e aponta `MSYS_NO_PATHCONV=1` |
 | R10 | Um `GET` em `/mcp` abre um stream SSE e **trava** o cliente | ⚠️ **Descoberto na Fase 1.** Em teste manual usar sempre `POST`; nunca `curl` sem `-X POST` |
 
 ### Decisões arquiteturais
@@ -596,16 +597,16 @@ Fase 7, e as respostas de **R2, R3, R4 e D2** da Fase 1.
 
 ## Tarefas
 
-- [ ] ler `REQUEST_STATE_SECRET` do ambiente e falhar a subida com mensagem clara se ausente ou com menos de 32 bytes
-- [ ] passar `request_state_security=RequestStateSecurity(keys=[bytes.fromhex(segredo)], ttl=900.0)` no construtor do `MCPServer`, **nunca** a ephemeral (D2 = 900 s)
-- [ ] garantir que o `requestState` carrega tudo que o servidor precisa para reconstruir o pedido, e que **nada** é guardado em memória entre o `input_required` e o retry
-- [ ] implementar o retry: ler `inputResponses` e `requestState` de dentro de `params`, reconstruir o pedido e concluir a reserva
-- [ ] confirmar (R3 já resolvido) que o *request binding* do boundary rejeita com `-32602` um retry com argumentos divergentes
-- [ ] confirmar que `requestState` adulterado ou expirado é rejeitado com `-32602`
-- [ ] confirmar (R4 já resolvido) que o resolver produz `-32021` com `data.requiredCapabilities` e HTTP 400 para cliente sem `elicitation.form`
-- [ ] tratar `DeclinedElicitation()` e `CancelledElicitation()` como conclusão normal: `resultType: "complete"`, sem `isError`, com `reservado: false` e `motivo: "recusado"`
-- [ ] garantir que nenhum segredo está hardcoded no código
-- [ ] commit por contexto, PR `feature/request-state-protegido` → `develop`, merge
+- [x] ler `REQUEST_STATE_SECRET` do ambiente e falhar a subida com mensagem clara se ausente ou com menos de 32 bytes
+- [x] passar `request_state_security=RequestStateSecurity(keys=[bytes.fromhex(segredo)], ttl=900.0)` no construtor do `MCPServer`, **nunca** a ephemeral (D2 = 900 s)
+- [x] garantir que o `requestState` carrega tudo que o servidor precisa para reconstruir o pedido, e que **nada** é guardado em memória entre o `input_required` e o retry
+- [x] implementar o retry: ler `inputResponses` e `requestState` de dentro de `params`, reconstruir o pedido e concluir a reserva
+- [x] confirmar (R3 já resolvido) que o *request binding* do boundary rejeita com `-32602` um retry com argumentos divergentes
+- [x] confirmar que `requestState` adulterado ou expirado é rejeitado com `-32602`
+- [x] confirmar (R4 já resolvido) que o resolver produz `-32021` com `data.requiredCapabilities` e HTTP 400 para cliente sem `elicitation.form`
+- [x] tratar `DeclinedElicitation()` e `CancelledElicitation()` como conclusão normal: `resultType: "complete"`, sem `isError`, com `reservado: false` e `motivo: "recusado"`
+- [x] garantir que nenhum segredo está hardcoded no código
+- [x] commit por contexto, PR `feature/request-state-protegido` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -930,7 +931,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 5 — Resource `politica://uso` | Concluída | Fase 3 | Verificações 7 e 8 passando; resposta idêntica à fixture 05 |
 | Fase 6 — `reservar_sala` caminho feliz | Concluída | Fases 4, 5 | Verificações 1 a 12 e 20 passando; 39 testes verdes |
 | Fase 7 — MRTR `input_required` | Concluída | Fases 1 (D1), 6 | **As 20 verificações do lado MCP passam**; resposta idêntica à fixture 03 |
-| Fase 8 — `requestState` protegido | Pendente | Fases 1 (R2/R3/R4/D2), 7 | |
+| Fase 8 — `requestState` protegido | Concluída | Fases 1 (R2/R3/R4/D2), 7 | **Servidor MCP completo**: 20/20 e retry sobrevivendo ao restart |
 | Fase 9 — Agente host MCP | Pendente | Fase 8 | |
 | Fase 10 — Agente servidor A2A | Pendente | Fase 9 | |
 | Fase 11 — A ponte | Pendente | Fases 9, 10 | |

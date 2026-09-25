@@ -418,19 +418,19 @@ Fase 3.
 
 ## Tarefas
 
-- [ ] implementar o parsing de ISO 8601 com offset `-03:00`, sem depender da data de hoje
-- [ ] implementar a validação de sala existente, levantando **`ToolError`** (de `mcp.server.mcpserver.exceptions`) com a mensagem `Sala inexistente: <id informado>` — uma `ValueError` comum perde o texto e reprova o validador
-- [ ] implementar a validação `fim > inicio`, com a mensagem exata
-- [ ] implementar a validação de janela 08:00–20:00, com a mensagem exata
-- [ ] implementar a validação de duração máxima de 2 horas, com a mensagem exata
-- [ ] fixar a **ordem** de validação: sala → intervalo invertido → janela → duração
-- [ ] implementar a detecção de sobreposição por sala
-- [ ] implementar o cálculo de alternativas: livres no intervalo, capacidade ≥ à da sala pedida, máximo 3, ordenadas por capacidade crescente e por id em empate
-- [ ] implementar `consultar_disponibilidade(sala, inicio, fim)` devolvendo `structuredContent` com o estado de disponibilidade e as reservas em conflito, além do bloco de texto
-- [ ] garantir que `consultar_disponibilidade` aplica as mesmas validações e devolve os mesmos erros de execução da reserva
-- [ ] confirmar o comportamento para tool inexistente (`-32602` ou `isError`) e documentar qual dos dois o SDK produz
-- [ ] escrever testes unitários das regras (janela, duração, intervalo, sobreposição, ordenação de alternativas)
-- [ ] commit por contexto, PR `feature/regras-e-disponibilidade` → `develop`, merge
+- [x] implementar o parsing de ISO 8601 com offset `-03:00`, sem depender da data de hoje
+- [x] implementar a validação de sala existente, levantando **`ToolError`** (de `mcp.server.mcpserver.exceptions`) com a mensagem `Sala inexistente: <id informado>` — uma `ValueError` comum perde o texto e reprova o validador
+- [x] implementar a validação `fim > inicio`, com a mensagem exata
+- [x] implementar a validação de janela 08:00–20:00, com a mensagem exata
+- [x] implementar a validação de duração máxima de 2 horas, com a mensagem exata
+- [x] fixar a **ordem** de validação: sala → intervalo invertido → janela → duração
+- [x] implementar a detecção de sobreposição por sala
+- [x] implementar o cálculo de alternativas: livres no intervalo, capacidade ≥ à da sala pedida, máximo 3, ordenadas por capacidade crescente e por id em empate
+- [x] implementar `consultar_disponibilidade(sala, inicio, fim)` devolvendo `structuredContent` com o estado de disponibilidade e as reservas em conflito, além do bloco de texto
+- [x] garantir que `consultar_disponibilidade` aplica as mesmas validações e devolve os mesmos erros de execução da reserva
+- [x] confirmar o comportamento para tool inexistente: o SDK devolve **`isError: true`** com `"Unknown tool: <nome>"`, nunca `-32602`. O validador aceita os dois
+- [x] escrever testes unitários das regras (janela, duração, intervalo, sobreposição, ordenação de alternativas)
+- [x] commit por contexto, PR `feature/regras-e-disponibilidade` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -926,7 +926,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 1 — Investigação do SDK e decisões | Concluída | - | R1–R4 respondidos; D1–D4 fechados; achados registrados |
 | Fase 2 — Scaffolding e gitflow | Concluída | Fase 1 | Deps travadas, .env.example, scripts e .gitattributes; publicado em origin/develop; sem PR (ver nota) |
 | Fase 3 — Servidor MCP base | Concluída | Fases 1, 2 | Verificações 2, 3, 4, 5, 6 e 8 passando; log com método, id e traceparent |
-| Fase 4 — Regras e `consultar_disponibilidade` | Pendente | Fase 3 | |
+| Fase 4 — Regras e `consultar_disponibilidade` | Concluída | Fase 3 | Verificações 10, 11 e 12 passando; 29 testes unitários verdes |
 | Fase 5 — Resource `politica://uso` | Pendente | Fase 3 | |
 | Fase 6 — `reservar_sala` caminho feliz | Pendente | Fases 4, 5 | |
 | Fase 7 — MRTR `input_required` | Pendente | Fases 1 (D1), 6 | |

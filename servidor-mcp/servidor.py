@@ -26,6 +26,7 @@ from mcp.server.mcpserver import (
     Resolve,
 )
 from mcp.server.mcpserver.exceptions import ToolError
+from mcp.server.request_state import RequestStateSecurity
 from pydantic import BaseModel, Field, create_model
 
 import dominio
@@ -40,12 +41,41 @@ from dominio import (
     ReservaOut,
 )
 from log import log_middleware
+from seguranca import SegredoInvalido, chave_do_request_state
 
 HOST = os.environ.get("MCP_HOST", "127.0.0.1")
 PORTA = int(os.environ.get("MCP_PORT", "7301"))
 CAMINHO = os.environ.get("MCP_PATH", "/mcp")
+if not CAMINHO.startswith("/"):
+    # No Git Bash, um MCP_PATH="/mcp" chega aqui convertido para um caminho do
+    # Windows. Sem esta checagem o erro so aparece la dentro do roteador.
+    print(
+        f"[mcp] MCP_PATH invalido: {CAMINHO!r}. O caminho precisa comecar com '/'. "
+        "No Git Bash, exporte MSYS_NO_PATHCONV=1 para desligar a conversao de caminhos.",
+        file=sys.stderr,
+    )
+    raise SystemExit(1)
 
-mcp = MCPServer("central-de-salas", version="1.0.0", middleware=[log_middleware])
+# Entre 5 e 30 minutos, como o enunciado exige. O intervalo precisa cobrir uma
+# pausa de Task do lado A2A sem manter um token util por tempo demais.
+VALIDADE_DO_REQUEST_STATE = 900.0
+
+try:
+    _CHAVE = chave_do_request_state()
+except SegredoInvalido as erro:
+    print(f"[mcp] {erro}", file=sys.stderr)
+    raise SystemExit(1) from None
+
+mcp = MCPServer(
+    "central-de-salas",
+    version="1.0.0",
+    middleware=[log_middleware],
+    # Chave fixa, vinda do ambiente, e nao a ephemeral que o SDK instala por
+    # padrao: com a ephemeral o token morre junto com o processo, e o retry
+    # precisa funcionar mesmo depois de um restart, porque o estado viaja no
+    # token e nao no servidor.
+    request_state_security=RequestStateSecurity(keys=[_CHAVE], ttl=VALIDADE_DO_REQUEST_STATE),
+)
 
 
 @mcp.tool()

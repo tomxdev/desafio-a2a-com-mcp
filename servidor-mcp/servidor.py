@@ -16,7 +16,8 @@ import sys
 
 from mcp.server import MCPServer
 
-from dominio import SALAS, ListaDeSalas
+import regras
+from dominio import SALAS, ConflitoOut, Disponibilidade, ListaDeSalas
 from log import log_middleware
 
 HOST = os.environ.get("MCP_HOST", "127.0.0.1")
@@ -32,6 +33,22 @@ def listar_salas() -> ListaDeSalas:
     # Devolver um modelo, e nao uma lista: o SDK so faz o bloco de texto e o
     # structuredContent baterem quando a saida e um objeto.
     return ListaDeSalas(salas=SALAS)
+
+
+@mcp.tool()
+def consultar_disponibilidade(sala: str, inicio: str, fim: str) -> Disponibilidade:
+    """Diz se uma sala esta livre no intervalo, e quais reservas conflitam."""
+    # As mesmas validacoes da reserva, com os mesmos erros de execucao.
+    _, comeco, termino = regras.validar_pedido(sala, inicio, fim)
+    colisoes = regras.conflitos(sala, comeco, termino)
+    return Disponibilidade(
+        sala=sala,
+        livre=not colisoes,
+        conflitos=[
+            ConflitoOut(id=r.id, inicio=r.inicio, fim=r.fim, responsavel=r.responsavel)
+            for r in colisoes
+        ],
+    )
 
 
 def criar_app():

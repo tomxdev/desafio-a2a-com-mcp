@@ -1,0 +1,5 @@
+# Normaliza para LF no repositorio. Os scripts .sh quebram no Linux com CRLF.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.jpg binary

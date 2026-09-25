@@ -163,7 +163,7 @@ Dependências principais:
 | R2 | `RequestStateSecurity.ephemeral()` (default) gera chave por processo e quebra após restart | ✅ **Resolvido na Fase 1:** `RequestStateSecurity(keys=[segredo], ttl=...)` sobrevive ao restart, comprovado |
 | R3 | A verificação 18 depende de o SDK vincular o token aos argumentos originais | ✅ **Resolvido na Fase 1:** o boundary faz *request binding*; retry com argumentos divergentes → `-32602` |
 | R4 | O `-32021` precisa sair com `data.requiredCapabilities` | ✅ **Resolvido na Fase 1:** o resolver produz `-32021` + `data.requiredCapabilities` + HTTP 400, nativamente |
-| R5 | `python3` não existe no Windows; o validador do enunciado usa `python3` | Aberto — Fase 13: README documenta `python` e `python3` |
+| R5 | `python3` não existe no Windows; o validador do enunciado usa `python3` | ✅ **Resolvido na Fase 13:** o README traz os comandos das duas plataformas e diz a diferença explicitamente |
 | R6 | Caminhos longos no Windows (limite de 260 chars) quebram `venv`/`ensurepip` | ⚠️ **Confirmado na Fase 1** (`WinError 206` no scratchpad, 241 chars). O projeto está em caminho longo — Fase 2 valida o venv **no próprio diretório do projeto** antes de qualquer outra coisa |
 | R7 | Header `Mcp-Name`/`Mcp-Method` que não bate com o corpo é recusado com `-32020` | ✅ **Resolvido na Fase 9:** o cliente do SDK monta os headers corretamente; o servidor recusa divergência nos dois campos, confirmado com teste negativo |
 | R8 | A verificação 34 varre **todas** as respostas A2A procurando os 40 primeiros caracteres do `requestState` | ✅ **Resolvido na Fase 11:** o estado pausado fica fora de `Task.como_json()`, com teste travando |
@@ -857,14 +857,14 @@ Fase 12 (a saída do validador entra no README).
 
 ## Tarefas
 
-- [ ] escrever **Como rodar**: comandos exatos, a partir de um clone limpo, para criar o ambiente, gerar e exportar o `REQUEST_STATE_SECRET`, subir o servidor MCP, subir o agente e rodar o validador
-- [ ] documentar o comando de geração do segredo (`python -c "import secrets; print(secrets.token_hex(32))"`) **sem** publicar o valor usado
-- [ ] documentar a diferença `python` / `python3` entre Windows e Linux/macOS (R5)
-- [ ] escrever **Onde a ponte acontece**: um parágrafo apontando o arquivo e a função em que o `input_required` do MCP vira `TASK_STATE_INPUT_REQUIRED`, e o ponto em que o `requestState` volta para o servidor
-- [ ] escrever **Decisões técnicas**: como o `requestState` foi protegido, por quanto tempo vale, e onde mora o estado das Tasks
-- [ ] registrar qualquer limitação real do SDK encontrada, com o trecho de evidência
-- [ ] escrever **Saída do validador**: a saída completa da última execução, em bloco de código
-- [ ] commit por contexto, PR `feature/readme` → `develop`, merge
+- [x] escrever **Como rodar**: comandos exatos, a partir de um clone limpo, para criar o ambiente, gerar e exportar o `REQUEST_STATE_SECRET`, subir o servidor MCP, subir o agente e rodar o validador
+- [x] documentar o comando de geração do segredo (`python -c "import secrets; print(secrets.token_hex(32))"`) **sem** publicar o valor usado
+- [x] documentar a diferença `python` / `python3` entre Windows e Linux/macOS (R5)
+- [x] escrever **Onde a ponte acontece**: um parágrafo apontando o arquivo e a função em que o `input_required` do MCP vira `TASK_STATE_INPUT_REQUIRED`, e o ponto em que o `requestState` volta para o servidor
+- [x] escrever **Decisões técnicas**: como o `requestState` foi protegido, por quanto tempo vale, e onde mora o estado das Tasks
+- [x] registrar qualquer limitação real do SDK encontrada, com o trecho de evidência
+- [x] escrever **Saída do validador**: a saída completa da última execução, em bloco de código
+- [x] commit por contexto, PR `feature/readme` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -944,7 +944,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 10 — Agente servidor A2A | Concluída | Fase 9 | 29 das 36 verificações; card idêntico à fixture 07 |
 | Fase 11 — A ponte | Concluída | Fases 9, 10 | **36/36 no validador, exit 0**; retry com id novo confirmado no stderr |
 | Fase 12 — Validação e fluxo do avaliador | Concluída | Fase 11 | 36/36 exit 0; os 13 passos do fluxo reproduzidos; pastas imutáveis intactas |
-| Fase 13 — README | Pendente | Fase 12 | |
+| Fase 13 — README | Concluída | Fase 12 | Quatro seções; afirmações conferidas contra o código; nenhum segredo publicado |
 | Fase 14 — Entrega e clone limpo | Pendente | Fase 13 | |
 
 Status possíveis: `Pendente`, `Em andamento`, `Bloqueada`, `Concluída`.

@@ -310,15 +310,16 @@ Fase 1 (decisão D3 sobre estrutura de pacotes).
 
 ## Tarefas
 
-- [ ] **primeiro de tudo (R6):** criar o venv dentro do próprio diretório do projeto e confirmar que `ensurepip` funciona; se der `WinError 206`, decidir e registrar a alternativa antes de seguir
-- [ ] criar a branch `develop` a partir de `main` e a branch `feature/scaffolding`
-- [ ] criar `pyproject.toml` na raiz com `requires-python = ">=3.10"` e as dependências travadas, usando as versões confirmadas na Fase 1: `mcp==2.2.0`, `starlette==1.7.0`, `uvicorn==0.54.0` (o SDK já arrasta `mcp-types`, `pydantic`, `cryptography`, `jsonschema` e **`httpx2`** — não declarar `httpx`)
-- [ ] confirmar que nenhuma dependência de provedor de LLM entra no `pyproject.toml`
-- [ ] criar `.env.example` com `REQUEST_STATE_SECRET=`, `MCP_PORT=7301`, `AGENTE_PORT=7300`, `MCP_URL=http://127.0.0.1:7301/mcp` e um comentário com o comando de geração do segredo
-- [ ] conferir que `.gitignore` já cobre `.env`, `.venv/` e `__pycache__/`
-- [ ] criar os scripts de subida dos dois processos, com caminhos entre aspas (R6) e leitura do `.env`
-- [ ] criar um venv do projeto e instalar as dependências a partir do `pyproject.toml`
-- [ ] commit por contexto, PR `feature/scaffolding` → `develop`, merge
+- [x] **primeiro de tudo (R6):** criar o venv dentro do próprio diretório do projeto e confirmar que `ensurepip` funciona; se der `WinError 206`, decidir e registrar a alternativa antes de seguir
+- [x] criar a branch `develop` a partir de `main` e a branch `feature/scaffolding`
+- [x] criar `pyproject.toml` na raiz com `requires-python = ">=3.10"` e as dependências travadas, usando as versões confirmadas na Fase 1: `mcp==2.2.0`, `starlette==1.7.0`, `uvicorn==0.54.0` (o SDK já arrasta `mcp-types`, `pydantic`, `cryptography`, `jsonschema` e **`httpx2`** — não declarar `httpx`)
+- [x] confirmar que nenhuma dependência de provedor de LLM entra no `pyproject.toml`
+- [x] criar `.env.example` com `REQUEST_STATE_SECRET=`, `MCP_PORT=7301`, `AGENTE_PORT=7300`, `MCP_URL=http://127.0.0.1:7301/mcp` e um comentário com o comando de geração do segredo
+- [x] conferir que `.gitignore` já cobre `.env`, `.venv/` e `__pycache__/`
+- [x] criar os scripts de subida dos dois processos, com caminhos entre aspas (R6) e leitura do `.env`
+- [x] criar um venv do projeto e instalar as dependências a partir do `pyproject.toml`
+- [x] commit por contexto (4 commits)
+- [ ] **BLOQUEADO:** push, PR `feature/scaffolding` → `develop`, merge — autenticacao do GitHub falhou
 
 ## Critérios de aceite
 
@@ -908,7 +909,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase | Status | Dependências | Resultado |
 | --- | --- | --- | --- |
 | Fase 1 — Investigação do SDK e decisões | Concluída | - | R1–R4 respondidos; D1–D4 fechados; achados registrados |
-| Fase 2 — Scaffolding e gitflow | Pendente | Fase 1 | |
+| Fase 2 — Scaffolding e gitflow | Bloqueada | Fase 1 | Local completo e verificado; push/PR bloqueados por credencial do GitHub |
 | Fase 3 — Servidor MCP base | Pendente | Fases 1, 2 | |
 | Fase 4 — Regras e `consultar_disponibilidade` | Pendente | Fase 3 | |
 | Fase 5 — Resource `politica://uso` | Pendente | Fase 3 | |

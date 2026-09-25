@@ -372,14 +372,14 @@ Fases 1 (R1) e 2.
 
 ## Tarefas
 
-- [ ] localizar e carregar `dados/salas.json` e `dados/reservas.json` em memória, sem escrever de volta no disco
-- [ ] instanciar `MCPServer("central-de-salas", version="1.0.0", middleware=[log_middleware])` declarando as capabilities de `tools` e `resources`
-- [ ] expor o app com `streamable_http_app(streamable_http_path="/mcp", stateless_http=True)` e servir na porta 7301 (parametrizável por env, padrão 7301)
-- [ ] implementar `listar_salas` sem parâmetros, devolvendo um **modelo pydantic** (não uma `list`), para que `structuredContent` e o bloco de texto sejam o mesmo JSON — ver o achado da Fase 1 sobre a verificação 3
-- [ ] implementar `log_middleware(ctx, call_next)` no formato `ServerMiddleware`, registrando em stderr `ctx.method`, `ctx.request_id` e o `traceparent` de `ctx.params["_meta"]`
-- [ ] confirmar (R1 já resolvido) que o SDK rejeita nativamente `_meta` sem `protocolVersion`/`clientCapabilities` com `-32602` + HTTP 400, **sem** middleware próprio
-- [ ] confirmar que a rejeição não infere versão nem capabilities de request anterior
-- [ ] commit por contexto, PR `feature/servidor-mcp-base` → `develop`, merge
+- [x] localizar e carregar `dados/salas.json` e `dados/reservas.json` em memória, sem escrever de volta no disco
+- [x] instanciar `MCPServer("central-de-salas", version="1.0.0", middleware=[log_middleware])` declarando as capabilities de `tools` e `resources`
+- [x] expor o app com `streamable_http_app(streamable_http_path="/mcp", stateless_http=True)` e servir na porta 7301 (parametrizável por env, padrão 7301)
+- [x] implementar `listar_salas` sem parâmetros, devolvendo um **modelo pydantic** (não uma `list`), para que `structuredContent` e o bloco de texto sejam o mesmo JSON — ver o achado da Fase 1 sobre a verificação 3
+- [x] implementar `log_middleware(ctx, call_next)` no formato `ServerMiddleware`, registrando em stderr `ctx.method`, `ctx.request_id` e o `traceparent` de `ctx.params["_meta"]`
+- [x] confirmar (R1 já resolvido) que o SDK rejeita nativamente `_meta` sem `protocolVersion`/`clientCapabilities` com `-32602` + HTTP 400, **sem** middleware próprio
+- [x] confirmar que a rejeição não infere versão nem capabilities de request anterior
+- [x] commit por contexto (3 commits), PR `feature/servidor-mcp-base` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -925,7 +925,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | --- | --- | --- | --- |
 | Fase 1 — Investigação do SDK e decisões | Concluída | - | R1–R4 respondidos; D1–D4 fechados; achados registrados |
 | Fase 2 — Scaffolding e gitflow | Concluída | Fase 1 | Deps travadas, .env.example, scripts e .gitattributes; publicado em origin/develop; sem PR (ver nota) |
-| Fase 3 — Servidor MCP base | Pendente | Fases 1, 2 | |
+| Fase 3 — Servidor MCP base | Concluída | Fases 1, 2 | Verificações 2, 3, 4, 5, 6 e 8 passando; log com método, id e traceparent |
 | Fase 4 — Regras e `consultar_disponibilidade` | Pendente | Fase 3 | |
 | Fase 5 — Resource `politica://uso` | Pendente | Fase 3 | |
 | Fase 6 — `reservar_sala` caminho feliz | Pendente | Fases 4, 5 | |

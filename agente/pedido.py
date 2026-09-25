@@ -4,6 +4,11 @@ Nada de linguagem natural e nada de LLM: o texto chega num formato fechado e
 o agente decide por regra. Dado o mesmo pedido, o mesmo resultado, sempre.
 
     reservar sala=<id> inicio=<iso8601> fim=<iso8601> responsavel=<nome>
+
+A resposta a uma pausa tambem e fixa:
+
+    escolha=<id da sala>   para aceitar
+    escolha=recusar        para recusar
 """
 
 from __future__ import annotations
@@ -12,11 +17,13 @@ import re
 from dataclasses import dataclass
 
 CAMPOS_DA_RESERVA = ("sala", "inicio", "fim", "responsavel")
+RECUSAR = "recusar"
 
 # `responsavel` pode ter espacos, entao cada campo vai ate o proximo rotulo.
 _CAMPO = re.compile(
     r"(?P<chave>sala|inicio|fim|responsavel)\s*=\s*(?P<valor>.*?)(?=\s+(?:sala|inicio|fim|responsavel)\s*=|$)"
 )
+_ESCOLHA = re.compile(r"^escolha\s*=\s*(?P<valor>\S.*)$", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -56,3 +63,15 @@ def interpretar_reserva(texto: str) -> Reserva:
         raise PedidoInvalido(f"faltam campos no pedido: {', '.join(faltando)}")
 
     return Reserva(**{c: encontrados[c] for c in CAMPOS_DA_RESERVA})
+
+
+def interpretar_escolha(texto: str) -> str:
+    """Le `escolha=<valor>`. O valor pode ser um id de sala ou `recusar`."""
+    encontrado = _ESCOLHA.match((texto or "").strip())
+    if not encontrado:
+        raise PedidoInvalido("responda com escolha=<id da sala> ou escolha=recusar")
+    return encontrado.group("valor").strip()
+
+
+def e_recusa(escolha: str) -> bool:
+    return escolha.casefold() == RECUSAR

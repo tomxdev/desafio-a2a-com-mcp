@@ -899,15 +899,15 @@ Fase 13.
 
 ## Tarefas
 
-- [ ] revisar o histórico de `develop`: commits por contexto, sem commits de "wip" acumulados
-- [ ] abrir o PR `develop` → `main` no remoto e aplicar o merge
-- [ ] conferir que a `main` remota contém toda a entrega
-- [ ] clonar o repositório em uma pasta limpa fora do diretório de trabalho
-- [ ] no clone limpo, seguir **apenas** o README: criar ambiente, exportar o segredo, subir os dois processos
-- [ ] rodar o validador no clone limpo e conferir 36/36 com código de saída 0
-- [ ] percorrer a checklist de Critérios de Aceite do `PLAN.md` item por item
-- [ ] confirmar que não há dependência de SDK de provedor de LLM no `pyproject.toml`
-- [ ] confirmar que `dados/`, `validador/` e `exemplos/` continuam idênticos ao starter
+- [x] revisar o histórico de `develop`: commits por contexto, sem commits de "wip" acumulados
+- [x] abrir o PR `develop` → `main` no remoto e aplicar o merge
+- [x] conferir que a `main` remota contém toda a entrega
+- [x] clonar o repositório em uma pasta limpa fora do diretório de trabalho
+- [x] no clone limpo, seguir **apenas** o README: criar ambiente, exportar o segredo, subir os dois processos
+- [x] rodar o validador no clone limpo e conferir 36/36 com código de saída 0
+- [x] percorrer a checklist de Critérios de Aceite do `PLAN.md` item por item
+- [x] confirmar que não há dependência de SDK de provedor de LLM no `pyproject.toml`
+- [x] confirmar que `dados/`, `validador/` e `exemplos/` continuam idênticos ao starter
 
 ## Critérios de aceite
 
@@ -921,6 +921,23 @@ Fase 13.
 - `git log --oneline main` mostrando o histórico por contexto
 - Execução completa do validador no clone limpo
 - Checklist do `PLAN.md` percorrida e registrada
+
+### Evidencia do clone limpo
+
+Clonado em `C:/Users/tomxdev/AppData/Local/Temp/clone-limpo`, seguindo **apenas** o
+README:
+
+```
+pip install -e .                 -> ok
+servidor sem a chave             -> recusa subir com a mensagem que ensina a gerar
+os dois processos                -> sobem em 7301 e 7300
+validador                        -> 36 passaram, 0 falharam | exit 0
+pytest                           -> 107 passando
+card                             -> skill reservar-sala | JSONRPC 1.0
+```
+
+O clone precisou de um diretorio de caminho curto: o limite de 260 chars do Windows
+(risco R6) tambem vale para quem for avaliar em caminho longo.
 
 ## Resultado esperado
 
@@ -945,7 +962,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 11 — A ponte | Concluída | Fases 9, 10 | **36/36 no validador, exit 0**; retry com id novo confirmado no stderr |
 | Fase 12 — Validação e fluxo do avaliador | Concluída | Fase 11 | 36/36 exit 0; os 13 passos do fluxo reproduzidos; pastas imutáveis intactas |
 | Fase 13 — README | Concluída | Fase 12 | Quatro seções; afirmações conferidas contra o código; nenhum segredo publicado |
-| Fase 14 — Entrega e clone limpo | Pendente | Fase 13 | |
+| Fase 14 — Entrega e clone limpo | Concluída | Fase 13 | Entregue em `main`; 36/36 e 107 testes em clone limpo seguindo só o README |
 
 Status possíveis: `Pendente`, `Em andamento`, `Bloqueada`, `Concluída`.
 

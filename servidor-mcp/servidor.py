@@ -14,8 +14,19 @@ from __future__ import annotations
 import os
 import sys
 
+from typing import Annotated, Literal
+
 from mcp.server import MCPServer
+from mcp.server.mcpserver import (
+    AcceptedElicitation,
+    CancelledElicitation,
+    DeclinedElicitation,
+    Elicit,
+    ElicitationResult,
+    Resolve,
+)
 from mcp.server.mcpserver.exceptions import ToolError
+from pydantic import BaseModel, Field, create_model
 
 import dominio
 import regras
@@ -61,24 +72,74 @@ def consultar_disponibilidade(sala: str, inicio: str, fim: str) -> Disponibilida
     )
 
 
-@mcp.tool()
-def reservar_sala(sala: str, inicio: str, fim: str, responsavel: str) -> ReservaOut:
-    """Reserva uma sala. Se o intervalo estiver ocupado, pergunta qual alternativa usar."""
+PERGUNTA = "A sala pedida esta ocupada nesse intervalo. Escolha uma alternativa."
+
+
+class Escolha(BaseModel):
+    """A sala que vai ser reservada de fato."""
+
+    sala: str = Field(description="Sala alternativa escolhida")
+
+
+def _escolha_entre(opcoes: list[str]) -> type[BaseModel]:
+    """Um modelo cujo campo `sala` so aceita as alternativas calculadas.
+
+    O enum e por pedido, entao o tipo precisa ser montado na hora: `Elicit`
+    recebe um tipo, nao um schema solto.
+    """
+    return create_model(
+        "Escolha",
+        sala=(Literal[tuple(opcoes)], Field(description="Sala alternativa escolhida")),  # type: ignore[valid-type]
+    )
+
+
+async def escolha_de_sala(sala: str, inicio: str, fim: str) -> Escolha | Elicit[Escolha]:
+    """Resolve qual sala reservar, perguntando ao cliente so quando precisa.
+
+    Este e o lado servidor do MRTR. Nao existe canal de volta: quando falta
+    informacao, o resolver nao pergunta e espera, ele faz a resposta terminar
+    em `input_required` com a elicitation e um `requestState` opaco. O cliente
+    volta com um `tools/call` novo levando a resposta e o estado ecoado.
+
+    O resolver roda em todas as rodadas, inclusive no retry, entao ele repete
+    as validacoes e o calculo de alternativas.
+    """
     pedida, comeco, termino = regras.validar_pedido(sala, inicio, fim)
 
-    if not regras.esta_livre(sala, comeco, termino):
-        opcoes = regras.alternativas(pedida, comeco, termino)
-        if not opcoes:
-            raise ToolError(regras.ERRO_SEM_ALTERNATIVAS)
-        # Caminho provisorio: e aqui que a Fase 7 devolve a elicitation em
-        # form mode, em vez de recusar o pedido.
-        raise ToolError(f"Sala ocupada no intervalo. Alternativas: {', '.join(opcoes)}")
+    if regras.esta_livre(sala, comeco, termino):
+        return Escolha(sala=sala)
 
-    nova = dominio.criar_reserva(sala, inicio, fim, responsavel)
+    opcoes = regras.alternativas(pedida, comeco, termino)
+    if not opcoes:
+        raise ToolError(regras.ERRO_SEM_ALTERNATIVAS)
+
+    return Elicit(PERGUNTA, _escolha_entre(opcoes))
+
+
+@mcp.tool()
+async def reservar_sala(
+    sala: str,
+    inicio: str,
+    fim: str,
+    responsavel: str,
+    escolha: Annotated[ElicitationResult[Escolha], Resolve(escolha_de_sala)],
+) -> ReservaOut:
+    """Reserva uma sala. Se o intervalo estiver ocupado, pergunta qual alternativa usar."""
+    # O union e obrigatorio: com a anotacao desembrulhada, uma recusa viraria
+    # erro de execucao em vez de concluir sem reservar.
+    match escolha:
+        case DeclinedElicitation() | CancelledElicitation():
+            return ReservaOut(reservado=False, motivo="recusado")
+        case AcceptedElicitation(data=decidida):
+            alvo = decidida.sala
+        case _:  # pragma: no cover - o SDK so produz os tres acima
+            raise ToolError("Resposta de elicitation inesperada")
+
+    nova = dominio.criar_reserva(alvo, inicio, fim, responsavel)
     return ReservaOut(
         reserva=nova.id,
         reservado=True,
-        sala=sala,
+        sala=alvo,
         inicio=inicio,
         fim=fim,
         responsavel=responsavel,

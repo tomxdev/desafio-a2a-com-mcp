@@ -15,9 +15,19 @@ import os
 import sys
 
 from mcp.server import MCPServer
+from mcp.server.mcpserver.exceptions import ToolError
 
+import dominio
 import regras
-from dominio import POLITICA, SALAS, ConflitoOut, Disponibilidade, ListaDeSalas
+from dominio import (
+    POLITICA,
+    SALAS,
+    VERSAO_DA_POLITICA,
+    ConflitoOut,
+    Disponibilidade,
+    ListaDeSalas,
+    ReservaOut,
+)
 from log import log_middleware
 
 HOST = os.environ.get("MCP_HOST", "127.0.0.1")
@@ -48,6 +58,31 @@ def consultar_disponibilidade(sala: str, inicio: str, fim: str) -> Disponibilida
             ConflitoOut(id=r.id, inicio=r.inicio, fim=r.fim, responsavel=r.responsavel)
             for r in colisoes
         ],
+    )
+
+
+@mcp.tool()
+def reservar_sala(sala: str, inicio: str, fim: str, responsavel: str) -> ReservaOut:
+    """Reserva uma sala. Se o intervalo estiver ocupado, pergunta qual alternativa usar."""
+    pedida, comeco, termino = regras.validar_pedido(sala, inicio, fim)
+
+    if not regras.esta_livre(sala, comeco, termino):
+        opcoes = regras.alternativas(pedida, comeco, termino)
+        if not opcoes:
+            raise ToolError(regras.ERRO_SEM_ALTERNATIVAS)
+        # Caminho provisorio: e aqui que a Fase 7 devolve a elicitation em
+        # form mode, em vez de recusar o pedido.
+        raise ToolError(f"Sala ocupada no intervalo. Alternativas: {', '.join(opcoes)}")
+
+    nova = dominio.criar_reserva(sala, inicio, fim, responsavel)
+    return ReservaOut(
+        reserva=nova.id,
+        reservado=True,
+        sala=sala,
+        inicio=inicio,
+        fim=fim,
+        responsavel=responsavel,
+        politica=VERSAO_DA_POLITICA,
     )
 
 

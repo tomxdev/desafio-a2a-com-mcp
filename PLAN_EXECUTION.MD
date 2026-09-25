@@ -505,14 +505,14 @@ Fases 4 e 5.
 
 ## Tarefas
 
-- [ ] implementar a geração de id sequencial de reserva no padrão `res-000N`, continuando a partir das reservas do arquivo
-- [ ] implementar `reservar_sala(sala, inicio, fim, responsavel)` no caminho livre, gravando a reserva em memória
-- [ ] garantir que a reserva criada é visível para as consultas seguintes do mesmo processo
-- [ ] devolver `structuredContent` com `reserva`, `reservado`, `sala`, `inicio`, `fim`, `responsavel`, `politica` e `motivo`, e o mesmo JSON no bloco de texto
-- [ ] preencher `politica` com a versão lida da primeira linha de `dados/politica-de-uso.md`
-- [ ] aplicar em `reservar_sala` as mesmas validações da Fase 4, com as mensagens exatas
-- [ ] conferir que as três tools têm `inputSchema` que é objeto JSON Schema válido
-- [ ] commit por contexto, PR `feature/reservar-caminho-feliz` → `develop`, merge
+- [x] implementar a geração de id sequencial de reserva no padrão `res-000N`, continuando a partir das reservas do arquivo
+- [x] implementar `reservar_sala(sala, inicio, fim, responsavel)` no caminho livre, gravando a reserva em memória
+- [x] garantir que a reserva criada é visível para as consultas seguintes do mesmo processo
+- [x] devolver `structuredContent` com `reserva`, `reservado`, `sala`, `inicio`, `fim`, `responsavel`, `politica` e `motivo`, e o mesmo JSON no bloco de texto
+- [x] preencher `politica` com a versão lida da primeira linha de `dados/politica-de-uso.md`
+- [x] aplicar em `reservar_sala` as mesmas validações da Fase 4, com as mensagens exatas
+- [x] conferir que as três tools têm `inputSchema` que é objeto JSON Schema válido
+- [x] commit por contexto, PR `feature/reservar-caminho-feliz` → `develop`, merge
 
 ## Critérios de aceite
 
@@ -928,7 +928,7 @@ Desafio entregue, verificável por terceiros a partir do repositório público.
 | Fase 3 — Servidor MCP base | Concluída | Fases 1, 2 | Verificações 2, 3, 4, 5, 6 e 8 passando; log com método, id e traceparent |
 | Fase 4 — Regras e `consultar_disponibilidade` | Concluída | Fase 3 | Verificações 10, 11 e 12 passando; 29 testes unitários verdes |
 | Fase 5 — Resource `politica://uso` | Concluída | Fase 3 | Verificações 7 e 8 passando; resposta idêntica à fixture 05 |
-| Fase 6 — `reservar_sala` caminho feliz | Pendente | Fases 4, 5 | |
+| Fase 6 — `reservar_sala` caminho feliz | Concluída | Fases 4, 5 | Verificações 1 a 12 e 20 passando; 39 testes verdes |
 | Fase 7 — MRTR `input_required` | Pendente | Fases 1 (D1), 6 | |
 | Fase 8 — `requestState` protegido | Pendente | Fases 1 (R2/R3/R4/D2), 7 | |
 | Fase 9 — Agente host MCP | Pendente | Fase 8 | |

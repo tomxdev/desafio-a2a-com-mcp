@@ -41,6 +41,23 @@ class Reserva(BaseModel):
     responsavel: str
 
 
+class ConflitoOut(BaseModel):
+    """Uma reserva que colide com o intervalo consultado."""
+
+    id: str
+    inicio: str
+    fim: str
+    responsavel: str
+
+
+class Disponibilidade(BaseModel):
+    """Saida de `consultar_disponibilidade`."""
+
+    sala: str
+    livre: bool
+    conflitos: list[ConflitoOut]
+
+
 def _ler_json(nome: str) -> list[dict]:
     return json.loads((DADOS / nome).read_text(encoding="utf-8"))
 
